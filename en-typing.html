@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英語長文タイピング検定</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Noto+Sans:wght@400;500;700&display=swap');
+
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .sync-text-box {
+            font-family: 'Noto Serif', serif;
+            font-size: 1.125rem;
+            line-height: 2.2;
+            letter-spacing: 0.02em;
+            text-align: justify;
+            word-wrap: break-word;
+            padding: 1.5rem;
+            width: 100%;
+            border-radius: 0.5rem;
+            outline: none;
+            
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 transparent;
+        }
+
+        .sync-text-box::-webkit-scrollbar {
+            width: 8px;
+        }
+        .sync-text-box::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .review-box {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .space-char {
+            color: #94a3b8;
+            font-weight: normal;
+        }
+
+        /* 通知アニメーション */
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { transform: translateY(0); opacity: 1; }
+            to { transform: translateY(-100%); opacity: 0; }
+        }
+        .toast-enter {
+            animation: slideDown 0.5s ease-out forwards;
+        }
+        .toast-exit {
+            animation: slideUp 0.5s ease-in forwards;
+        }
+
+        /* ----- 印刷用のスタイル ----- */
+        #print-area {
+            display: none;
+        }
+        @media print {
+            body { background-color: white; }
+            /* 通常のUIを非表示 */
+            #toast-container, header, main {
+                display: none !important;
+            }
+            /* 印刷エリアを表示 */
+            #print-area {
+                display: block !important;
+            }
+            @page {
+                size: A4;
+                margin: 20mm;
+            }
+            .a4-paper {
+                width: 100%;
+            }
+            .mode-en {
+                font-family: "Courier New", Courier, monospace;
+                font-size: 12pt;
+            }
+            .mode-en .doc-title {
+                text-align: center;
+                font-size: 14pt;
+                font-weight: bold;
+                margin-bottom: 20mm;
+                text-transform: uppercase;
+            }
+            .mode-en .text-line {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-end;
+                line-height: 2.0;
+            }
+            .char-count {
+                color: #555;
+                font-size: 10pt;
+                font-family: Arial, sans-serif;
+                min-width: 40px;
+                text-align: right;
+            }
+            .text-content {
+                white-space: pre;
+            }
+        }
+    </style>
+</head>
+<body class="text-gray-800 min-h-screen flex flex-col relative">
+
+    <div id="toast-container" class="fixed top-20 left-0 right-0 z-50 flex justify-center pointer-events-none"></div>
+
+    <!-- 印刷用エリア -->
+    <div id="print-area"></div>
+
+    <header class="bg-white shadow-sm py-4 px-6 flex justify-between items-center z-10 relative">
+        <h1 class="text-xl font-bold text-indigo-700 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-keyboard"><path d="M10 8h.01"/><path d="M14 8h.01"/><path d="M18 8h.01"/><path d="M6 8h.01"/><path d="M10 12h.01"/><path d="M14 12h.01"/><path d="M18 12h.01"/><path d="M6 12h.01"/><path d="M10 16h4"/><rect width="20" height="16" x="2" y="4" rx="2"/></svg>
+            英語長文タイピング検定
+        </h1>
+        <div class="mode-switcher" style="text-align: right; margin: 10px 20px 0 0;">
+            <a href="https://jp-typing.edgeone.app" style="display: inline-block; padding: 8px 16px; background-color: #3182CE; color: white; text-decoration: none; border-radius: 5px; font-size: 14px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                🍣 日本語タイピング
+            </a>
+        </div>
+        <div id="header-timer" class="hidden text-2xl font-mono font-bold text-gray-700 bg-gray-100 px-4 py-1 rounded-md border border-gray-200 transition-colors">
+            10:00
+        </div>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center p-4 relative overflow-hidden">
+        
+        <div id="start-screen" class="bg-white p-8 rounded-xl shadow-lg max-w-2xl w-full text-center relative z-10 transition-opacity duration-300">
+            <h2 class="text-3xl font-bold mb-6 text-gray-800">タイピング検定へようこそ</h2>
+
+            <div class="text-left space-y-4 mb-8 text-gray-600 bg-indigo-50 p-6 rounded-lg border border-indigo-100">
+                <p class="font-bold text-indigo-900 mb-2 border-b border-indigo-200 pb-2">【検定ルール】</p>
+                <ul class="list-disc list-inside space-y-2">
+                    <li>制限時間は<strong>設定した時間</strong>です。</li>
+                    <li>課題文章（約2,000文字以上）は外部の<strong>JSONデータベースからランダムに非同期で</strong>選ばれます。</li>
+                    <li><strong>半角英数字</strong>で入力してください。大文字・小文字、コンマ、ピリオド、スペースも正確に入力する必要があります。</li>
+                    <li>左側に表示される課題文を見ながら、右側の入力エリアにひたすら入力してください。Enterキーによる改行入力は不要です（スペース扱いで判定されます）。</li>
+                    <li>終了後、入力内容の印刷が可能です。</li>
+                </ul>
+            </div>
+            
+            <div class="mb-8 flex items-center justify-center gap-3">
+                <label for="time-setting" class="font-bold text-gray-700 text-lg">制限時間:</label>
+                <input type="number" id="time-setting" min="1" max="60" value="10" class="border-2 border-gray-300 rounded-lg px-4 py-2 w-24 text-lg text-center focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-colors">
+                <span class="font-bold text-gray-700 text-lg">分</span>
+            </div>
+
+            <button id="start-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white text-lg font-bold py-3 px-12 rounded-full shadow-md transition-transform transform hover:scale-105 active:scale-95">
+                検定スタート
+            </button>
+        </div>
+
+        <div id="game-screen" class="hidden flex-col w-full max-w-6xl h-[85vh] bg-white rounded-xl shadow-lg overflow-hidden relative z-10">
+            <div class="w-full bg-gray-200 h-2">
+                <div id="progress-bar" class="bg-indigo-600 h-2 transition-all duration-1000 ease-linear" style="width: 0%"></div>
+            </div>
+
+            <div class="flex flex-col md:flex-row h-full">
+                <div class="md:w-1/2 flex flex-col border-b md:border-b-0 md:border-r border-gray-200 bg-gray-50">
+                    <div class="px-6 pt-6 pb-2">
+                        <h3 class="text-sm font-bold text-gray-500 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
+                            課題テキスト <span id="target-title" class="ml-2 text-indigo-600 font-normal"></span>
+                        </h3>
+                    </div>
+                    <div class="flex-grow p-4 overflow-hidden flex">
+                        <div id="target-text-display" class="sync-text-box border-2 border-transparent overflow-y-auto text-gray-700 whitespace-pre-wrap select-none">Loading...</div>
+                    </div>
+                </div>
+
+                <div class="md:w-1/2 flex flex-col bg-white">
+                    <div class="px-6 pt-6 pb-2 flex justify-between items-end">
+                        <h3 class="text-sm font-bold text-gray-500 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pen-tool"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg>
+                            入力エリア
+                        </h3>
+                        <div class="text-sm text-indigo-600 font-bold bg-indigo-50 px-3 py-1 rounded-full">
+                            Characters: <span id="current-length">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-grow p-4 flex flex-col">
+                        <textarea id="user-input" 
+                            class="sync-text-box flex-grow border-2 border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-colors resize-none shadow-sm bg-white"
+                            placeholder="Type the text shown on the left here..."
+                            autocomplete="off" spellcheck="false"></textarea>
+                        
+                        <div class="mt-4 flex justify-end">
+                            <button id="finish-early-btn" class="bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 px-6 rounded-lg shadow transition-colors flex items-center gap-2">
+                                検定を終了して結果を見る
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="result-screen" class="hidden bg-white p-8 md:p-12 rounded-xl shadow-xl max-w-5xl w-full text-center relative z-10 overflow-y-auto max-h-[90vh]">
+            <div class="inline-block p-4 rounded-full bg-green-100 text-green-600 mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-circle"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <h2 class="text-4xl font-bold mb-2 text-gray-800">検定終了</h2>
+            <p id="finish-reason" class="text-gray-500 mb-8">タイムアップ</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <p class="text-sm text-gray-500 font-bold mb-1">総入力文字数</p>
+                    <div class="flex items-baseline justify-center gap-1">
+                        <span id="res-input-chars" class="text-3xl font-black text-indigo-700">0</span>
+                    </div>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <p class="text-sm text-gray-500 font-bold mb-1">正確率</p>
+                    <div class="flex items-baseline justify-center gap-1">
+                        <span id="res-accuracy" class="text-3xl font-black text-emerald-600">0.0</span>
+                        <span class="text-gray-500">%</span>
+                    </div>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <p class="text-sm text-gray-500 font-bold mb-1">入力スピード</p>
+                    <div class="flex items-baseline justify-center gap-1">
+                        <span id="res-wpm" class="text-3xl font-black text-blue-600">0</span>
+                        <span class="text-sm text-gray-500">CPM (文字/分)</span>
+                    </div>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <p class="text-sm text-gray-500 font-bold mb-1">評価ランク</p>
+                    <div class="flex items-baseline justify-center gap-1">
+                        <span id="res-rank" class="text-3xl font-black text-amber-500">C</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 text-left">
+                <div class="bg-red-50/50 p-6 rounded-lg border border-red-100 flex flex-col h-full">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-red-900">あなたの入力内容 (採点)</h3>
+                        <div class="flex gap-2 text-xs font-bold bg-white p-2 rounded shadow-sm border border-red-100">
+                            <span class="flex items-center gap-1"><span class="inline-block w-3 h-3 bg-red-300 rounded-sm"></span> 誤字</span>
+                            <span class="flex items-center gap-1"><span class="inline-block w-3 h-3 bg-yellow-300 rounded-sm"></span> 余分</span>
+                            <span class="flex items-center gap-1"><span class="inline-block w-3 h-3 bg-gray-300 rounded-sm"></span> 脱字</span>
+                        </div>
+                    </div>
+                    <div id="review-area" class="sync-text-box review-box bg-white border border-gray-200 shadow-inner text-gray-800 flex-grow font-mono text-base"></div>
+                </div>
+
+                <div class="bg-indigo-50/50 p-6 rounded-lg border border-indigo-100 flex flex-col h-full">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-indigo-900">手本 (正解テキスト)</h3>
+                        <div class="flex gap-3 text-xs font-bold bg-white p-2 rounded shadow-sm border border-indigo-100">
+                            <span class="flex items-center gap-1"><span class="inline-block w-3 h-1 bg-red-400"></span> 誤字</span>
+                            <span class="flex items-center gap-1"><span class="inline-block w-3 h-1 bg-yellow-400"></span> 余分の周辺</span>
+                            <span class="flex items-center gap-1"><span class="inline-block w-3 h-1 bg-gray-400"></span> 脱字</span>
+                        </div>
+                    </div>
+                    <div id="correct-text-area" class="sync-text-box review-box bg-white border border-gray-200 shadow-inner text-gray-600 flex-grow font-mono text-base whitespace-pre-wrap select-none"></div>
+                </div>
+            </div>
+
+            <!-- 印刷＆戻るボタン群 -->
+            <div class="flex flex-col sm:flex-row justify-center gap-4 mt-6">
+                <button id="btn-print-target" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-bold py-3 px-6 rounded-full transition-colors border border-indigo-300 shadow-sm flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-printer"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+                    課題文を印刷
+                </button>
+                <button id="btn-print-user" class="bg-red-100 hover:bg-red-200 text-red-800 font-bold py-3 px-6 rounded-full transition-colors border border-red-300 shadow-sm flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-printer"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+                    自分の入力を印刷
+                </button>
+                <button onclick="location.reload()" class="bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 px-8 rounded-full transition-colors shadow-sm">
+                    タイトルに戻る
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let targetTextObj = {};
+        let rawText = '';
+        let cleanTargetText = '';
+        let GAME_TIME_SECONDS = 10 * 60; 
+        let timeLeft = GAME_TIME_SECONDS;
+        let timerInterval = null;
+        let isPlaying = false;
+        
+        let alert2MinShown = false;
+        let alert10SecShown = false;
+
+        const screens = {
+            start: document.getElementById('start-screen'),
+            game: document.getElementById('game-screen'),
+            result: document.getElementById('result-screen')
+        };
+        const headerTimer = document.getElementById('header-timer');
+        const progressBar = document.getElementById('progress-bar');
+        const targetTitleDisplay = document.getElementById('target-title');
+        const targetTextDisplay = document.getElementById('target-text-display');
+        const userInput = document.getElementById('user-input');
+        const currentLengthDisplay = document.getElementById('current-length');
+        const reviewArea = document.getElementById('review-area');
+        const correctTextArea = document.getElementById('correct-text-area');
+        const toastContainer = document.getElementById('toast-container');
+        const printArea = document.getElementById('print-area');
+
+        function showToast(message, type = 'warning') {
+            const toast = document.createElement('div');
+            let bgColor = 'bg-yellow-400 text-yellow-900 border-yellow-500';
+            let icon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-alert-triangle"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12" y1="17" y2="17"/></svg>`;
+            if (type === 'danger') {
+                bgColor = 'bg-red-500 text-white border-red-600';
+                icon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-alert-circle"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12" y1="16" y2="16"/></svg>`;
+            }
+            toast.className = `toast-enter flex items-center gap-2 px-6 py-3 rounded-full shadow-lg border-2 font-bold text-lg ${bgColor}`;
+            toast.innerHTML = `${icon} <span>${message}</span>`;
+            toastContainer.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.remove('toast-enter');
+                toast.classList.add('toast-exit');
+                setTimeout(() => { if (toastContainer.contains(toast)) toastContainer.removeChild(toast); }, 500);
+            }, 4000);
+        }
+
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60);
+            const s = seconds % 60;
+            return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
+
+        function normalizeTargetText(text) {
+            return text.replace(/[\n\r]+/g, ' ').replace(/\s{2,}/g, ' ').trim();
+        }
+
+        // 英文に合わせた正規化
+        function normalizeUserText(text) {
+            return text.replace(/[\n\r]+/g, ' ');
+        }
+
+        function visualizeSpace(char) {
+            return char === ' ' ? '␣' : char;
+        }
+
+        function renderPrintEnglish(text, titlePrefix) {
+            printArea.innerHTML = '';
+            printArea.className = 'a4-paper mode-en';
+            const printText = text.replace(/[\n\r]+/g, ' ').replace(/\s{2,}/g, ' ').trim();
+            let html = `<div class="doc-title">${titlePrefix}</div>`;
+            const maxLen = 60;
+            let cumulativeCount = 0;
+            let currentIdx = 0;
+            while (currentIdx < printText.length) {
+                let lineText = "";
+                if (printText.length - currentIdx <= maxLen) {
+                    lineText = printText.substring(currentIdx);
+                    currentIdx = printText.length;
+                } else {
+                    let breakIdx = currentIdx + maxLen;
+                    while (breakIdx > currentIdx && printText[breakIdx] !== ' ') {
+                        breakIdx--;
+                    }
+                    if (breakIdx === currentIdx) {
+                        breakIdx = currentIdx + maxLen;
+                    }
+                    lineText = printText.substring(currentIdx, breakIdx);
+                    currentIdx = breakIdx + 1; 
+                }
+                cumulativeCount += lineText.length;
+                html += `<div class="text-line"><span class="text-content">${lineText}</span><span class="char-count">[${cumulativeCount}]</span></div>`;
+            }
+            printArea.innerHTML = html;
+        }
+
+        function calculateDiff(userText, targetText) {
+            if (userText.length === 0) return [];
+            const n = targetText.length;
+            const m = userText.length;
+            const dp = Array.from({ length: n + 1 }, () => new Uint16Array(m + 1));
+            for (let i = 0; i <= n; i++) dp[i][0] = i;
+            for (let j = 0; j <= m; j++) dp[0][j] = j;
+            for (let i = 1; i <= n; i++) {
+                for (let j = 1; j <= m; j++) {
+                    if (targetText[i - 1] === userText[j - 1]) {
+                        dp[i][j] = dp[i - 1][j - 1];
+                    } else {
+                        dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + 1);
+                    }
+                }
+            }
+            let minCost = Infinity;
+            let endI = n;
+            for (let i = 0; i <= n; i++) {
+                if (dp[i][m] < minCost) {
+                    minCost = dp[i][m];
+                    endI = i;
+                }
+            }
+            let i = endI;
+            let j = m;
+            const diff = [];
+            while (i > 0 || j > 0) {
+                if (i > 0 && j > 0 && targetText[i - 1] === userText[j - 1]) {
+                    diff.push({ type: 'match', char: targetText[i - 1] });
+                    i--; j--;
+                } else {
+                    const costReplace = (i > 0 && j > 0) ? dp[i - 1][j - 1] : Infinity;
+                    const costDelete = i > 0 ? dp[i - 1][j] : Infinity; 
+                    const costInsert = j > 0 ? dp[i][j - 1] : Infinity; 
+                    const minPrevCost = Math.min(costReplace, costDelete, costInsert);
+                    if (minPrevCost === costReplace && dp[i][j] === costReplace + 1) {
+                        diff.push({ type: 'replace', expected: targetText[i - 1], actual: userText[j - 1] });
+                        i--; j--;
+                    } else if (minPrevCost === costDelete && dp[i][j] === costDelete + 1) {
+                        diff.push({ type: 'delete', expected: targetText[i - 1] });
+                        i--;
+                    } else if (minPrevCost === costInsert && dp[i][j] === costInsert + 1) {
+                        diff.push({ type: 'insert', actual: userText[j - 1] });
+                        j--;
+                    } else {
+                        break; 
+                    }
+                }
+            }
+            return diff.reverse();
+        }
+
+        async function startGame() {
+            targetTextDisplay.textContent = "Loading question data...";
+            
+            // 💡 英語版が正しく questions_en.json を探しにいくように完璧に修正！
+            const targetJsonFile = 'questions_en.json';
+            
+            try {
+                const response = await fetch(targetJsonFile);
+                if (!response.ok) {
+                    throw new Error(`Server Response Error (${response.status})`);
+                }
+                
+                const rawTexts = await response.json();
+
+                targetTextObj = rawTexts[Math.floor(Math.random() * rawTexts.length)];
+                rawText = targetTextObj.text;
+                cleanTargetText = normalizeTargetText(rawText);
+
+                targetTitleDisplay.textContent = targetTextObj.title;
+                targetTextDisplay.textContent = rawText; 
+                
+                const timeInput = parseInt(document.getElementById('time-setting').value, 10);
+                GAME_TIME_SECONDS = (isNaN(timeInput) || timeInput <= 0) ? 10 * 60 : timeInput * 60;
+
+                screens.start.classList.add('hidden');
+                screens.game.classList.remove('hidden');
+                screens.game.classList.add('flex');
+                headerTimer.classList.remove('hidden');
+
+                timeLeft = GAME_TIME_SECONDS;
+                isPlaying = true;
+                alert2MinShown = false;
+                alert10SecShown = false;
+                
+                headerTimer.textContent = formatTime(timeLeft);
+                headerTimer.classList.remove('text-red-600', 'bg-red-50');
+                userInput.value = '';
+                userInput.focus();
+                
+                if (timerInterval) clearInterval(timerInterval);
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    headerTimer.textContent = formatTime(timeLeft);
+                    
+                    progressBar.style.width = `${((GAME_TIME_SECONDS - timeLeft) / GAME_TIME_SECONDS) * 100}%`;
+
+                    if (timeLeft === 120 && !alert2MinShown && GAME_TIME_SECONDS > 120) {
+                        showToast("Remaining time: 2 minutes!", "warning");
+                        alert2MinShown = true;
+                    }
+                    if (timeLeft <= 60 && !headerTimer.classList.contains('text-red-600')) {
+                        headerTimer.classList.add('text-red-600', 'bg-red-50');
+                        headerTimer.classList.remove('text-gray-700', 'bg-gray-100');
+                    }
+                    if (timeLeft === 10 && !alert10SecShown && GAME_TIME_SECONDS > 10) {
+                        showToast("Remaining time: 10 seconds! Final sprint!", "danger");
+                        alert10SecShown = true;
+                    }
+                    if (timeLeft <= 0) {
+                        endGame("タイムアップ！");
+                    }
+                }, 1000);
+
+            } catch (error) {
+                console.error(error);
+                // 💡 英語で具体的に何が起きているかエラー詳細を画面に表示！
+                targetTextDisplay.innerHTML = `<div class="text-red-600 font-bold p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <p class="text-lg mb-2">⚠️ Failed to load question file</p>
+                    <p class="text-sm text-gray-700 font-normal leading-relaxed">
+                        Reason: <strong>"${targetJsonFile}"</strong> was not found or is blocked by your browser.<br><br>
+                        <strong>[How to fix]</strong><br>
+                        1. Make sure you have uploaded the file named <strong>"questions_en.json"</strong> to the exact same folder as this HTML.<br>
+                        2. If the files are correctly placed, this error is caused by your browser's local security block (CORS). Please upload files to your web hosting server or use live local servers like "Live Server" in VS Code to test.
+                    </p>
+                </div>`;
+                showToast("Could not load JSON file.", "danger");
+            }
+        }
+
+        userInput.addEventListener('input', () => {
+            if (!isPlaying) return;
+            const cleanUserText = normalizeUserText(userInput.value);
+            currentLengthDisplay.textContent = cleanUserText.length;
+        });
+
+        function renderReview(diff) {
+            reviewArea.innerHTML = '';
+            correctTextArea.innerHTML = ''; 
+
+            if (diff.length === 0) {
+                reviewArea.innerHTML = '<p class="text-gray-500">No input detected.</p>';
+                correctTextArea.innerHTML = '<p class="text-gray-500">No input detected.</p>';
+                return;
+            }
+
+            const correctSpans = []; 
+
+            diff.forEach(d => {
+                const span = document.createElement('span');
+                if (d.type === 'match') {
+                    span.textContent = d.char;
+                    if (d.char === ' ') span.className = 'space-char';
+                } else if (d.type === 'replace') {
+                    span.textContent = visualizeSpace(d.actual);
+                    span.className = 'bg-red-200 text-red-900 font-bold px-0.5 mx-px rounded border-b-2 border-red-500';
+                    span.title = `Incorrect (Expected: ${visualizeSpace(d.expected)})`;
+                } else if (d.type === 'insert') {
+                    span.textContent = visualizeSpace(d.actual);
+                    span.className = 'bg-yellow-200 text-yellow-900 font-bold px-0.5 mx-px rounded border-b-2 border-yellow-500';
+                    span.title = `Extra character`;
+                } else if (d.type === 'delete') {
+                    span.textContent = visualizeSpace(d.expected);
+                    span.className = 'bg-gray-300 text-gray-500 line-through px-0.5 mx-px rounded';
+                    span.title = `Missing character`;
+                }
+                reviewArea.appendChild(span);
+
+                if (d.type === 'match') {
+                    const cSpan = document.createElement('span');
+                    cSpan.textContent = d.char;
+                    if (d.char === ' ') cSpan.className = 'space-char';
+                    correctSpans.push(cSpan);
+                } else if (d.type === 'replace') {
+                    const cSpan = document.createElement('span');
+                    cSpan.textContent = visualizeSpace(d.expected);
+                    cSpan.className = 'border-b-4 border-red-400 text-red-900 font-bold bg-red-50 px-0.5';
+                    cSpan.title = `Incorrect part (Your input: ${visualizeSpace(d.actual)})`;
+                    correctSpans.push(cSpan);
+                } else if (d.type === 'delete') {
+                    const cSpan = document.createElement('span');
+                    cSpan.textContent = visualizeSpace(d.expected);
+                    cSpan.className = 'border-b-4 border-gray-400 text-gray-900 font-bold bg-gray-100 px-0.5';
+                    cSpan.title = `Missing part`;
+                    correctSpans.push(cSpan);
+                } else if (d.type === 'insert') {
+                    if (correctSpans.length > 0) {
+                        const lastSpan = correctSpans[correctSpans.length - 1];
+                        lastSpan.classList.add('border-b-4', 'border-yellow-400', 'bg-yellow-50', 'font-bold');
+                        lastSpan.title = lastSpan.title ? lastSpan.title + ` / Extra input after this` : `Extra input after this: ${visualizeSpace(d.actual)}`;
+                    } else {
+                        const marker = document.createElement('span');
+                        marker.textContent = ' ';
+                        marker.className = 'border-b-4 border-yellow-400 bg-yellow-50';
+                        marker.title = `Extra input at start: ${visualizeSpace(d.actual)}`;
+                        correctSpans.push(marker);
+                    }
+                }
+            });
+
+            correctSpans.forEach(span => correctTextArea.appendChild(span));
+        }
+
+        function endGame(reason) {
+            isPlaying = false;
+            clearInterval(timerInterval);
+            toastContainer.innerHTML = ''; 
+            
+            screens.game.classList.remove('flex');
+            screens.game.classList.add('hidden');
+            screens.result.classList.remove('hidden');
+            headerTimer.classList.add('hidden');
+
+            document.getElementById('finish-reason').textContent = reason;
+
+            const cleanUserText = normalizeUserText(userInput.value);
+            const totalInputChars = cleanUserText.length;
+            
+            const elapsedSeconds = GAME_TIME_SECONDS - Math.max(0, timeLeft);
+            const elapsedMinutes = elapsedSeconds / 60;
+
+            let accuracy = 0;
+            let wpm = 0;
+
+            if (totalInputChars > 0) {
+                const diff = calculateDiff(cleanUserText, cleanTargetText);
+                const mistakes = diff.filter(d => d.type !== 'match').length;
+                
+                const correctChars = Math.max(0, totalInputChars - mistakes);
+                accuracy = (correctChars / totalInputChars) * 100;
+                
+                renderReview(diff);
+            } else {
+                renderReview([]);
+            }
+            
+            if (elapsedMinutes > 0) {
+                wpm = Math.round(totalInputChars / elapsedMinutes);
+            }
+
+            let rank = 'C';
+            let rankColor = 'text-gray-500';
+            if (wpm >= 350 && accuracy >= 95) { rank = 'S'; rankColor = 'text-yellow-400'; }
+            else if (wpm >= 250 && accuracy >= 90) { rank = 'A'; rankColor = 'text-red-500'; }
+            else if (wpm >= 150 && accuracy >= 80) { rank = 'B'; rankColor = 'text-blue-500'; }
+
+            document.getElementById('res-input-chars').textContent = totalInputChars;
+            document.getElementById('res-accuracy').textContent = accuracy.toFixed(1);
+            document.getElementById('res-wpm').textContent = wpm;
+            
+            const rankEl = document.getElementById('res-rank');
+            rankEl.textContent = rank;
+            rankEl.className = `text-4xl font-black ${rankColor}`;
+        }
+
+        document.getElementById('start-btn').addEventListener('click', startGame);
+        document.getElementById('finish-early-btn').addEventListener('click', () => {
+            endGame("検定を終了しました");
+        });
+
+        document.getElementById('btn-print-target').addEventListener('click', () => {
+            renderPrintEnglish(rawText, 'Typing Test Text'); 
+            window.print();
+        });
+        document.getElementById('btn-print-user').addEventListener('click', () => {
+            renderPrintEnglish(userInput.value, 'Your Input Text');
+            window.print();
+        });
+
+    </script>
+</body>
+</html>
