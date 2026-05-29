@@ -127,7 +127,6 @@
             英語長文タイピング検定
         </h1>
         <div class="mode-switcher" style="text-align: right; margin: 10px 20px 0 0;">
-            <!-- 🔗 日本語版（jp-typing.html）のGitHub Pagesの絶対URLに書き換え完了 -->
             <a href="https://ssio40.github.io/typing/jp-typing.html" style="display: inline-block; padding: 8px 16px; background-color: #3182CE; color: white; text-decoration: none; border-radius: 5px; font-size: 14px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                 🍣 日本語タイピング
             </a>
@@ -345,7 +344,6 @@
             return text.replace(/[\n\r]+/g, ' ').replace(/\s{2,}/g, ' ').trim();
         }
 
-        // 英文に合わせた正規化
         function normalizeUserText(text) {
             return text.replace(/[\n\r]+/g, ' ');
         }
@@ -417,7 +415,7 @@
                     i--; j--;
                 } else {
                     const costReplace = (i > 0 && j > 0) ? dp[i - 1][j - 1] : Infinity;
-                    const costDelete = i > 0 ? dp[i - 1][j]; 
+                    const costDelete = i > 0 ? dp[i - 1][j] : Infinity; 
                     const costInsert = j > 0 ? dp[i][j - 1] : Infinity; 
                     const minPrevCost = Math.min(costReplace, costDelete, costInsert);
                     if (minPrevCost === costReplace && dp[i][j] === costReplace + 1) {
@@ -440,8 +438,8 @@
         async function startGame() {
             targetTextDisplay.textContent = "Loading question data...";
             
-            // 💡 英語版が正しく questions_en.json を探しにいくように完璧に修正！
-            const targetJsonFile = 'questions_en.json';
+            // 💡 キャッシュバスター：URLに現在の時刻をくっつけることで、ブラウザに「古いデータを使わず最新を取りに行け！」と強制命令を出します。
+            const targetJsonFile = 'questions_en.json?t=' + new Date().getTime();
             
             try {
                 const response = await fetch(targetJsonFile);
@@ -449,9 +447,28 @@
                     throw new Error(`Server Response Error (${response.status})`);
                 }
                 
-                const rawTexts = await response.json();
+                let rawTexts = await response.json();
+
+                // 💡 自己修復システム：もしJSONが二重に文字列化されて壊れていた場合、プログラムが自動で直してくれます！
+                if (typeof rawTexts === 'string') {
+                    try {
+                        rawTexts = JSON.parse(rawTexts);
+                    } catch (e) {
+                        throw new Error("JSON Format Error: The file content is severely broken and cannot be parsed.");
+                    }
+                }
+
+                // データの形が正しいか最終チェック
+                if (!Array.isArray(rawTexts) || rawTexts.length === 0) {
+                    throw new Error("Data Error: The JSON file is empty or not formatted as an array [ ... ].");
+                }
 
                 targetTextObj = rawTexts[Math.floor(Math.random() * rawTexts.length)];
+                
+                if (!targetTextObj || !targetTextObj.text) {
+                    throw new Error("Data Error: The 'text' property is missing in the selected question.");
+                }
+
                 rawText = targetTextObj.text;
                 cleanTargetText = normalizeTargetText(rawText);
 
@@ -496,20 +513,34 @@
                         alert10SecShown = true;
                     }
                     if (timeLeft <= 0) {
-                        endGame("タイムアップ！");
+                        endGame("Time's up!");
                     }
                 }, 1000);
 
             } catch (error) {
                 console.error(error);
-                // 💡 英語で具体的に何が起きているかエラー詳細を画面に表示！
+                
+                // 💡 エラーの原因を判定して、F12を見なくても画面上に赤字で分かりやすく表示します！
+                let specificReason = "File not found or blocked by CORS.";
+                let howToFix = "1. Make sure you have uploaded <strong>questions_en.json</strong> to the exact same folder as this HTML.<br>2. Make sure the spelling is exactly correct (e.g. no .txt at the end).";
+                
+                if (error.message.includes("Unexpected") || error.message.includes("JSON") || error.name === "SyntaxError") {
+                    specificReason = "JSON Format Error (Syntax Error). The contents of the file are broken.";
+                    howToFix = "The file was found, but the data inside is corrupted. Please copy and paste the correct JSON data into <strong>questions_en.json</strong> again. Make sure you don't miss the <strong>[</strong> and <strong>]</strong> brackets at the start and end.";
+                } else if (error.message.includes("Data Error")) {
+                    specificReason = error.message;
+                    howToFix = "The file was loaded, but the structure is wrong. Ensure it is a valid array of objects.";
+                } else if (error.message.includes("404")) {
+                    specificReason = error.message;
+                }
+
                 targetTextDisplay.innerHTML = `<div class="text-red-600 font-bold p-4 bg-red-50 border border-red-200 rounded-lg">
                     <p class="text-lg mb-2">⚠️ Failed to load question file</p>
                     <p class="text-sm text-gray-700 font-normal leading-relaxed">
-                        Reason: <strong>"${targetJsonFile}"</strong> was not found or is blocked by your browser.<br><br>
+                        Error Detail: <strong>${error.message}</strong><br>
+                        Probable Reason: <strong><span class="text-red-600">${specificReason}</span></strong><br><br>
                         <strong>[How to fix]</strong><br>
-                        1. Make sure you have uploaded the file named <strong>"questions_en.json"</strong> to the exact same folder as this HTML.<br>
-                        2. If the files are correctly placed, this error is caused by your browser's local security block (CORS). Please upload files to your web hosting server or use live local servers like "Live Server" in VS Code to test.
+                        ${howToFix}
                     </p>
                 </div>`;
                 showToast("Could not load JSON file.", "danger");
