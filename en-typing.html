@@ -127,7 +127,8 @@
             英語長文タイピング検定
         </h1>
         <div class="mode-switcher" style="text-align: right; margin: 10px 20px 0 0;">
-            <a href="https://ssio40.github.io/typing/jp-typing" style="display: inline-block; padding: 8px 16px; background-color: #3182CE; color: white; text-decoration: none; border-radius: 5px; font-size: 14px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <!-- 🔗 日本語版（jp-typing.html）のGitHub Pagesの絶対URLに書き換え完了 -->
+            <a href="https://ssio40.github.io/typing/jp-typing.html" style="display: inline-block; padding: 8px 16px; background-color: #3182CE; color: white; text-decoration: none; border-radius: 5px; font-size: 14px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                 🍣 日本語タイピング
             </a>
         </div>
@@ -416,7 +417,7 @@
                     i--; j--;
                 } else {
                     const costReplace = (i > 0 && j > 0) ? dp[i - 1][j - 1] : Infinity;
-                    const costDelete = i > 0 ? dp[i - 1][j] : Infinity; 
+                    const costDelete = i > 0 ? dp[i - 1][j]; 
                     const costInsert = j > 0 ? dp[i][j - 1] : Infinity; 
                     const minPrevCost = Math.min(costReplace, costDelete, costInsert);
                     if (minPrevCost === costReplace && dp[i][j] === costReplace + 1) {
