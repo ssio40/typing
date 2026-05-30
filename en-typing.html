@@ -279,7 +279,7 @@
                     課題文を印刷
                 </button>
                 <button id="btn-print-user" class="bg-red-100 hover:bg-red-200 text-red-800 font-bold py-3 px-6 rounded-full transition-colors border border-red-300 shadow-sm flex items-center justify-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2-2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
                     自分の入力を印刷
                 </button>
                 <button onclick="location.reload()" class="bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 px-8 rounded-full transition-colors shadow-sm">
@@ -438,12 +438,12 @@
             return diff.reverse();
         }
 
-        // 🚀 外部JSONファイル読み込み処理（自己修復・キャッシュバスター付き）
+        // 🚀 外部JSONファイル読み込み処理（自己修復・キャッシュバスター削除版）
         async function startGame() {
             targetTextDisplay.textContent = "Loading question data...";
             
-            // 💡 URLの末尾に時刻を付けてブラウザのキャッシュを強制的に回避する
-            const targetJsonFile = 'questions_en.json?t=' + new Date().getTime();
+            // 💡 余計なキャッシュ回避機能（?t=...）を完全に削除しました！これでローカルでも確実に動きます。
+            const targetJsonFile = 'questions_en.json';
             
             try {
                 const response = await fetch(targetJsonFile);
@@ -453,7 +453,6 @@
                 
                 let rawTexts = await response.json();
 
-                // 💡 自己修復: もしJSONが「文字列」として誤保存されていたら自動解読する
                 if (typeof rawTexts === 'string') {
                     try {
                         rawTexts = JSON.parse(rawTexts);
@@ -558,8 +557,9 @@
                 } else if (error.message.includes("Data Error")) {
                     specificReason = error.message;
                     howToFix = "The file was loaded, but the structure is wrong. Ensure it is a valid array of objects.";
-                } else if (error.message.includes("404")) {
+                } else if (error.message.includes("404") || error.message.includes("Failed to fetch")) {
                     specificReason = error.message;
+                    howToFix = "If you are opening this file locally (on your PC), your browser might block loading JSON. Please upload to GitHub Pages and test!";
                 }
 
                 targetTextDisplay.innerHTML = `<div class="text-red-600 font-bold p-4 bg-red-50 border border-red-200 rounded-lg">
