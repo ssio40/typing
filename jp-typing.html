@@ -209,7 +209,7 @@
 
         <div id="result-screen" class="hidden bg-white p-8 md:p-12 rounded-xl shadow-xl max-w-5xl w-full text-center relative z-10 overflow-y-auto max-h-[90vh]">
             <div class="inline-block p-4 rounded-full bg-green-100 text-green-600 mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.8 3.8l16.4 16.4M3 21h18M5 16h14M7 11h10M9 6h6"/></svg>
             </div>
             <h2 class="text-4xl font-bold mb-2 text-gray-800">検定終了</h2>
             <p id="finish-reason" class="text-gray-500 mb-8">タイムアップ</p>
@@ -416,12 +416,11 @@
             currentLengthDisplay.textContent = cleanUserText.length;
         });
 
-        // 🚀 外部JSONファイル読み込み処理（自己修復・キャッシュバスター付き）
         async function startGame() {
             targetTextDisplay.textContent = "お題をロードしています...";
             
-            // 💡 URLの末尾に時刻を付けてブラウザのキャッシュを強制的に回避する
-            const targetJsonFile = 'questions_ja.json?t=' + new Date().getTime();
+            // 💡 余計なキャッシュ回避機能（?t=...）を完全に削除しました！これでローカルでも確実に動きます。
+            const targetJsonFile = 'questions_ja.json';
             
             try {
                 const response = await fetch(targetJsonFile);
@@ -431,7 +430,6 @@
                 
                 let rawTexts = await response.json();
 
-                // 💡 自己修復: もしJSONが「文字列」として誤保存されていたら自動解読する
                 if (typeof rawTexts === 'string') {
                     try {
                         rawTexts = JSON.parse(rawTexts);
@@ -531,15 +529,16 @@
             } catch (error) {
                 console.error(error);
                 let specificReason = "File not found or blocked by CORS.";
-                let howToFix = "1. あなたのフォルダ内にある日本語問題のファイル名が <strong>questions_ja.json</strong> になっているか確認してください。<br>2. ブラウザが古い情報を記憶している可能性があります。「Ctrl + F5」キーでページを強力に更新してください。";
+                let howToFix = "1. あなたのフォルダ内にある日本語問題のファイル名が <strong>questions_ja.json</strong> になっているか確認してください。<br>2. ブラウザが古い情報を記憶している可能性があります。「Ctrl + F5」キーでページを更新してください。";
                 
                 if (error.message.includes("Unexpected") || error.message.includes("JSON") || error.name === "SyntaxError") {
                     specificReason = "JSON Format Error (Syntax Error). The contents of the file are broken.";
                     howToFix = "JSONの中身が壊れています。もう一度データをコピーし直してみてください。";
                 } else if (error.message.includes("Data Error")) {
                     specificReason = error.message;
-                } else if (error.message.includes("404")) {
+                } else if (error.message.includes("404") || error.message.includes("Failed to fetch")) {
                     specificReason = error.message;
+                    howToFix = "ローカル環境（パソコンの中）で直接開いている場合、ブラウザの制限でJSONを読み込めません。GitHub Pagesなどにアップロードしてから確認してください！";
                 }
 
                 targetTextDisplay.innerHTML = `<div class="text-red-600 font-bold p-4 bg-red-50 border border-red-200 rounded-lg">
