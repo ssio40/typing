@@ -164,6 +164,13 @@
         </div>
 
         <div id="game-screen" class="hidden flex-col w-full max-w-6xl h-[85vh] bg-white rounded-xl shadow-lg overflow-hidden relative z-10">
+            
+            <!-- カウントダウン用オーバーレイ -->
+            <div id="countdown-overlay" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/90 backdrop-blur-sm hidden">
+                <div id="countdown-text" class="text-9xl font-black text-indigo-600 drop-shadow-lg">3</div>
+                <p class="text-xl text-gray-500 font-bold mt-4">Get ready...</p>
+            </div>
+
             <div class="w-full bg-gray-200 h-2">
                 <div id="progress-bar" class="bg-indigo-600 h-2 transition-all duration-1000 ease-linear" style="width: 0%"></div>
             </div>
@@ -196,7 +203,7 @@
                         <textarea id="user-input" 
                             class="sync-text-box flex-grow border-2 border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-colors resize-none shadow-sm bg-white"
                             placeholder="Type the text shown on the left here..."
-                            autocomplete="off" spellcheck="false"></textarea>
+                            autocomplete="off" spellcheck="false" disabled></textarea>
                         
                         <div class="mt-4 flex justify-end">
                             <button id="finish-early-btn" class="bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 px-6 rounded-lg shadow transition-colors flex items-center gap-2">
@@ -296,9 +303,6 @@
         let timeLeft = GAME_TIME_SECONDS;
         let timerInterval = null;
         let isPlaying = false;
-        
-        let alert2MinShown = false;
-        let alert10SecShown = false;
 
         const screens = {
             start: document.getElementById('start-screen'),
@@ -315,6 +319,8 @@
         const correctTextArea = document.getElementById('correct-text-area');
         const toastContainer = document.getElementById('toast-container');
         const printArea = document.getElementById('print-area');
+        const countdownOverlay = document.getElementById('countdown-overlay');
+        const countdownText = document.getElementById('countdown-text');
 
         function showToast(message, type = 'warning') {
             const toast = document.createElement('div');
@@ -438,18 +444,17 @@
         async function startGame() {
             targetTextDisplay.textContent = "Loading question data...";
             
-            // 💡 キャッシュバスター：URLに現在の時刻をくっつけることで、ブラウザに「古いデータを使わず最新を取りに行け！」と強制命令を出します。
+            // JSON読み込みと解析
             const targetJsonFile = 'questions_en.json?t=' + new Date().getTime();
             
             try {
                 const response = await fetch(targetJsonFile);
                 if (!response.ok) {
-                    throw new Error(`Server Response Error (${response.status})`);
+                    throw new Error(`404_NOT_FOUND: The file could not be found. (Status ${response.status})`);
                 }
                 
                 let rawTexts = await response.json();
 
-                // 💡 自己修復システム：もしJSONが二重に文字列化されて壊れていた場合、プログラムが自動で直してくれます！
                 if (typeof rawTexts === 'string') {
                     try {
                         rawTexts = JSON.parse(rawTexts);
@@ -458,7 +463,6 @@
                     }
                 }
 
-                // データの形が正しいか最終チェック
                 if (!Array.isArray(rawTexts) || rawTexts.length === 0) {
                     throw new Error("Data Error: The JSON file is empty or not formatted as an array [ ... ].");
                 }
@@ -478,58 +482,85 @@
                 const timeInput = parseInt(document.getElementById('time-setting').value, 10);
                 GAME_TIME_SECONDS = (isNaN(timeInput) || timeInput <= 0) ? 10 * 60 : timeInput * 60;
 
+                // 画面遷移と初期化
                 screens.start.classList.add('hidden');
                 screens.game.classList.remove('hidden');
                 screens.game.classList.add('flex');
                 headerTimer.classList.remove('hidden');
 
                 timeLeft = GAME_TIME_SECONDS;
-                isPlaying = true;
-                alert2MinShown = false;
-                alert10SecShown = false;
+                isPlaying = false;
                 
                 headerTimer.textContent = formatTime(timeLeft);
                 headerTimer.classList.remove('text-red-600', 'bg-red-50');
-                userInput.value = '';
-                userInput.focus();
+                progressBar.style.width = '0%';
                 
-                if (timerInterval) clearInterval(timerInterval);
-                timerInterval = setInterval(() => {
-                    timeLeft--;
-                    headerTimer.textContent = formatTime(timeLeft);
-                    
-                    progressBar.style.width = `${((GAME_TIME_SECONDS - timeLeft) / GAME_TIME_SECONDS) * 100}%`;
+                userInput.value = '';
+                userInput.disabled = true; // 入力ロック
+                
+                // カウントダウン開始
+                countdownOverlay.classList.remove('hidden');
+                let count = 3;
+                countdownText.textContent = count;
+                countdownText.className = "text-9xl font-black text-indigo-600 drop-shadow-lg";
 
-                    if (timeLeft === 120 && !alert2MinShown && GAME_TIME_SECONDS > 120) {
-                        showToast("Remaining time: 2 minutes!", "warning");
-                        alert2MinShown = true;
-                    }
-                    if (timeLeft <= 60 && !headerTimer.classList.contains('text-red-600')) {
-                        headerTimer.classList.add('text-red-600', 'bg-red-50');
-                        headerTimer.classList.remove('text-gray-700', 'bg-gray-100');
-                    }
-                    if (timeLeft === 10 && !alert10SecShown && GAME_TIME_SECONDS > 10) {
-                        showToast("Remaining time: 10 seconds! Final sprint!", "danger");
-                        alert10SecShown = true;
-                    }
-                    if (timeLeft <= 0) {
-                        endGame("Time's up!");
+                const countInterval = setInterval(() => {
+                    count--;
+                    if (count > 0) {
+                        countdownText.textContent = count;
+                    } else if (count === 0) {
+                        countdownText.textContent = "START!";
+                        countdownText.className = "text-8xl font-black text-red-500 drop-shadow-lg";
+                    } else {
+                        // カウントダウン終了、タイピング開始
+                        clearInterval(countInterval);
+                        countdownOverlay.classList.add('hidden');
+                        
+                        isPlaying = true;
+                        userInput.disabled = false;
+                        userInput.focus(); // フォーカスを当てて入力可能に
+                        
+                        // メインタイマー開始
+                        if (timerInterval) clearInterval(timerInterval);
+                        let alert2MinShown = false;
+                        let alert10SecShown = false;
+                        
+                        timerInterval = setInterval(() => {
+                            timeLeft--;
+                            headerTimer.textContent = formatTime(timeLeft);
+                            
+                            progressBar.style.width = `${((GAME_TIME_SECONDS - timeLeft) / GAME_TIME_SECONDS) * 100}%`;
+
+                            if (timeLeft === 120 && !alert2MinShown && GAME_TIME_SECONDS > 120) {
+                                showToast("Remaining time: 2 minutes!", "warning");
+                                alert2MinShown = true;
+                            }
+                            if (timeLeft <= 60 && !headerTimer.classList.contains('text-red-600')) {
+                                headerTimer.classList.add('text-red-600', 'bg-red-50');
+                                headerTimer.classList.remove('text-gray-700', 'bg-gray-100');
+                            }
+                            if (timeLeft === 10 && !alert10SecShown && GAME_TIME_SECONDS > 10) {
+                                showToast("Remaining time: 10 seconds! Final sprint!", "danger");
+                                alert10SecShown = true;
+                            }
+                            if (timeLeft <= 0) {
+                                endGame("Time's up!");
+                            }
+                        }, 1000);
                     }
                 }, 1000);
 
             } catch (error) {
                 console.error(error);
-                
-                // 💡 エラーの原因を判定して、F12を見なくても画面上に赤字で分かりやすく表示します！
                 let specificReason = "File not found or blocked by CORS.";
-                let howToFix = "1. Make sure you have uploaded <strong>questions_en.json</strong> to the exact same folder as this HTML.<br>2. Make sure the spelling is exactly correct (e.g. no .txt at the end).";
+                let howToFix = "1. Make sure you have uploaded <strong>questions_en.json</strong> to the exact same folder as this HTML.<br>2. Make sure the spelling is exactly correct.";
                 
                 if (error.message.includes("Unexpected") || error.message.includes("JSON") || error.name === "SyntaxError") {
                     specificReason = "JSON Format Error (Syntax Error). The contents of the file are broken.";
-                    howToFix = "The file was found, but the data inside is corrupted. Please copy and paste the correct JSON data into <strong>questions_en.json</strong> again. Make sure you don't miss the <strong>[</strong> and <strong>]</strong> brackets at the start and end.";
+                    howToFix = "Please copy and paste the correct JSON data into <strong>questions_en.json</strong> again.";
                 } else if (error.message.includes("Data Error")) {
                     specificReason = error.message;
-                    howToFix = "The file was loaded, but the structure is wrong. Ensure it is a valid array of objects.";
+                    howToFix = "Ensure the JSON is a valid array of objects.";
                 } else if (error.message.includes("404")) {
                     specificReason = error.message;
                 }

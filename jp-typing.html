@@ -166,6 +166,7 @@
 
         <!-- プレイ画面 -->
         <div id="game-screen" class="hidden flex-col w-full max-w-6xl h-[85vh] bg-white rounded-xl shadow-lg overflow-hidden relative z-10">
+            
             <!-- カウントダウン用オーバーレイ -->
             <div id="countdown-overlay" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/90 backdrop-blur-sm hidden">
                 <div id="countdown-text" class="text-9xl font-black text-indigo-600 drop-shadow-lg">3</div>
@@ -206,7 +207,7 @@
                         <textarea id="user-input" 
                             class="sync-text-box flex-grow border-2 border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-colors resize-none shadow-sm bg-white"
                             placeholder="左の課題テキストを見ながら、ここに入力してください..."
-                            autocomplete="off" spellcheck="false"></textarea>
+                            autocomplete="off" spellcheck="false" disabled></textarea>
                         
                         <div class="mt-4 flex justify-end">
                             <button id="finish-early-btn" class="bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 px-6 rounded-lg shadow transition-colors flex items-center gap-2">
@@ -328,6 +329,8 @@
         const correctTextArea = document.getElementById('correct-text-area');
         const toastContainer = document.getElementById('toast-container');
         const printArea = document.getElementById('print-area');
+        const countdownOverlay = document.getElementById('countdown-overlay');
+        const countdownText = document.getElementById('countdown-text');
 
         function showToast(message, type = 'warning') {
             const toast = document.createElement('div');
@@ -431,7 +434,6 @@
         async function startGame() {
             targetTextDisplay.textContent = "お題をロードしています...";
             
-            // 💡 魔法の呪文① キャッシュ（古いデータ）を無視して必ず最新のファイルを読みに行く
             const targetJsonFile = 'questions_ja.json?t=' + new Date().getTime();
             
             try {
@@ -442,7 +444,6 @@
                 
                 let rawTexts = await response.json();
 
-                // 💡 魔法の呪文② 【自己修復】もしJSONが「文字列」として誤保存されていたら自動解読する！
                 if (typeof rawTexts === 'string') {
                     try {
                         rawTexts = JSON.parse(rawTexts);
@@ -451,7 +452,6 @@
                     }
                 }
 
-                // データの形が正しいか最終チェック
                 if (!Array.isArray(rawTexts) || rawTexts.length === 0) {
                     throw new Error("問題データが空っぽか、正しい形式 [ ... ] ではありません。");
                 }
@@ -471,6 +471,7 @@
                 const timeInput = parseInt(document.getElementById('time-setting').value, 10);
                 GAME_TIME_SECONDS = (isNaN(timeInput) || timeInput <= 0) ? 10 * 60 : timeInput * 60;
 
+                // 画面切り替えと初期化
                 screens.start.classList.add('hidden');
                 screens.game.classList.remove('hidden');
                 screens.game.classList.add('flex');
@@ -478,19 +479,16 @@
 
                 timeLeft = GAME_TIME_SECONDS;
                 isPlaying = false;
-                alert2MinShown = false;
-                alert10SecShown = false;
-                isComposing = false;
                 
                 headerTimer.textContent = formatTime(timeLeft);
                 headerTimer.classList.remove('text-red-600', 'bg-red-50');
+                progressBar.style.width = '0%';
+                
                 userInput.value = '';
-                userInput.disabled = true;
+                userInput.disabled = true; // 入力ロック
                 
-                const countdownOverlay = document.getElementById('countdown-overlay');
-                const countdownText = document.getElementById('countdown-text');
+                // カウントダウン開始
                 countdownOverlay.classList.remove('hidden');
-                
                 let count = 3;
                 countdownText.textContent = count;
                 countdownText.className = "text-9xl font-black text-indigo-600 drop-shadow-lg";
@@ -503,14 +501,20 @@
                         countdownText.textContent = "START!";
                         countdownText.className = "text-8xl font-black text-red-500 drop-shadow-lg";
                     } else {
+                        // カウントダウン終了、タイピング開始
                         clearInterval(countInterval);
                         countdownOverlay.classList.add('hidden');
                         
                         isPlaying = true;
                         userInput.disabled = false;
-                        userInput.focus();
+                        userInput.focus(); // フォーカスを当てて入力可能に
                         
+                        // メインタイマー開始
                         if (timerInterval) clearInterval(timerInterval);
+                        let alert2MinShown = false;
+                        let alert10SecShown = false;
+                        isComposing = false;
+                        
                         timerInterval = setInterval(() => {
                             timeLeft--;
                             headerTimer.textContent = formatTime(timeLeft);
@@ -538,16 +542,25 @@
 
             } catch (error) {
                 console.error(error);
+                let specificReason = "File not found or blocked by CORS.";
+                let howToFix = "1. あなたのフォルダ内にある日本語問題のファイル名が <strong>questions_ja.json</strong> になっているか確認してください。<br>2. ブラウザが古い情報を記憶している可能性があります。「Ctrl + F5」キーでページを強力に更新してください。";
                 
-                // 💡 具体的にエラーの原因ファイルを画面に表示するようにパワーアップ！
+                if (error.message.includes("Unexpected") || error.message.includes("JSON") || error.name === "SyntaxError") {
+                    specificReason = "JSON Format Error (Syntax Error). The contents of the file are broken.";
+                    howToFix = "JSONの中身が壊れています。もう一度データをコピーし直してみてください。";
+                } else if (error.message.includes("Data Error")) {
+                    specificReason = error.message;
+                } else if (error.message.includes("404")) {
+                    specificReason = error.message;
+                }
+
                 targetTextDisplay.innerHTML = `<div class="text-red-600 font-bold p-4 bg-red-50 border border-red-200 rounded-lg">
                     <p class="text-lg mb-2">⚠️ 問題ファイルをロードできませんでした</p>
                     <p class="text-sm text-gray-700 font-normal leading-relaxed">
-                        エラー詳細: <strong>${error.message}</strong><br><br>
+                        エラー詳細: <strong>${error.message}</strong><br>
+                        原因: <strong><span class="text-red-600">${specificReason}</span></strong><br><br>
                         <strong>【解決方法】</strong><br>
-                        1. あなたのフォルダ内にある日本語問題のファイル名が <strong>"questions_ja.json"</strong> になっているか確認してください。<br>
-                        2. ブラウザが古い情報を記憶している可能性があります。「Ctrl + F5」キーでページを強力に更新してください。<br>
-                        3. JSONの中身が壊れている可能性があります。もう一度データをコピーし直してみてください。
+                        ${howToFix}
                     </p>
                 </div>`;
                 showToast("JSONファイルの読み込みに失敗しました。", "danger");
