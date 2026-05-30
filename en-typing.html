@@ -47,7 +47,6 @@
             font-weight: normal;
         }
 
-        /* 通知アニメーション */
         @keyframes slideDown {
             from { transform: translateY(-100%); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
@@ -63,17 +62,14 @@
             animation: slideUp 0.5s ease-in forwards;
         }
 
-        /* ----- 印刷用のスタイル ----- */
         #print-area {
             display: none;
         }
         @media print {
             body { background-color: white; }
-            /* 通常のUIを非表示 */
             #toast-container, header, main {
                 display: none !important;
             }
-            /* 印刷エリアを表示 */
             #print-area {
                 display: block !important;
             }
@@ -118,12 +114,11 @@
 
     <div id="toast-container" class="fixed top-20 left-0 right-0 z-50 flex justify-center pointer-events-none"></div>
 
-    <!-- 印刷用エリア -->
     <div id="print-area"></div>
 
     <header class="bg-white shadow-sm py-4 px-6 flex justify-between items-center z-10 relative">
         <h1 class="text-xl font-bold text-indigo-700 flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-keyboard"><path d="M10 8h.01"/><path d="M14 8h.01"/><path d="M18 8h.01"/><path d="M6 8h.01"/><path d="M10 12h.01"/><path d="M14 12h.01"/><path d="M18 12h.01"/><path d="M6 12h.01"/><path d="M10 16h4"/><rect width="20" height="16" x="2" y="4" rx="2"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 8h.01"/><path d="M14 8h.01"/><path d="M18 8h.01"/><path d="M6 8h.01"/><path d="M10 12h.01"/><path d="M14 12h.01"/><path d="M18 12h.01"/><path d="M6 12h.01"/><path d="M10 16h4"/><rect width="20" height="16" x="2" y="4" rx="2"/></svg>
             英語長文タイピング検定
         </h1>
         <div class="mode-switcher" style="text-align: right; margin: 10px 20px 0 0;">
@@ -165,7 +160,6 @@
 
         <div id="game-screen" class="hidden flex-col w-full max-w-6xl h-[85vh] bg-white rounded-xl shadow-lg overflow-hidden relative z-10">
             
-            <!-- カウントダウン用オーバーレイ -->
             <div id="countdown-overlay" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/90 backdrop-blur-sm hidden">
                 <div id="countdown-text" class="text-9xl font-black text-indigo-600 drop-shadow-lg">3</div>
                 <p class="text-xl text-gray-500 font-bold mt-4">Get ready...</p>
@@ -179,7 +173,7 @@
                 <div class="md:w-1/2 flex flex-col border-b md:border-b-0 md:border-r border-gray-200 bg-gray-50">
                     <div class="px-6 pt-6 pb-2">
                         <h3 class="text-sm font-bold text-gray-500 flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
                             課題テキスト <span id="target-title" class="ml-2 text-indigo-600 font-normal"></span>
                         </h3>
                     </div>
@@ -191,7 +185,7 @@
                 <div class="md:w-1/2 flex flex-col bg-white">
                     <div class="px-6 pt-6 pb-2 flex justify-between items-end">
                         <h3 class="text-sm font-bold text-gray-500 flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pen-tool"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg>
                             入力エリア
                         </h3>
                         <div class="text-sm text-indigo-600 font-bold bg-indigo-50 px-3 py-1 rounded-full">
@@ -208,7 +202,7 @@
                         <div class="mt-4 flex justify-end">
                             <button id="finish-early-btn" class="bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 px-6 rounded-lg shadow transition-colors flex items-center gap-2">
                                 検定を終了して結果を見る
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                             </button>
                         </div>
                     </div>
@@ -218,7 +212,7 @@
 
         <div id="result-screen" class="hidden bg-white p-8 md:p-12 rounded-xl shadow-xl max-w-5xl w-full text-center relative z-10 overflow-y-auto max-h-[90vh]">
             <div class="inline-block p-4 rounded-full bg-green-100 text-green-600 mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-circle"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.8 3.8l16.4 16.4M3 21h18M5 16h14M7 11h10M9 6h6"/></svg>
             </div>
             <h2 class="text-4xl font-bold mb-2 text-gray-800">検定終了</h2>
             <p id="finish-reason" class="text-gray-500 mb-8">タイムアップ</p>
@@ -281,11 +275,11 @@
             <!-- 印刷＆戻るボタン群 -->
             <div class="flex flex-col sm:flex-row justify-center gap-4 mt-6">
                 <button id="btn-print-target" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-bold py-3 px-6 rounded-full transition-colors border border-indigo-300 shadow-sm flex items-center justify-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-printer"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
                     課題文を印刷
                 </button>
                 <button id="btn-print-user" class="bg-red-100 hover:bg-red-200 text-red-800 font-bold py-3 px-6 rounded-full transition-colors border border-red-300 shadow-sm flex items-center justify-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-printer"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
                     自分の入力を印刷
                 </button>
                 <button onclick="location.reload()" class="bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 px-8 rounded-full transition-colors shadow-sm">
@@ -303,6 +297,9 @@
         let timeLeft = GAME_TIME_SECONDS;
         let timerInterval = null;
         let isPlaying = false;
+        
+        let alert2MinShown = false;
+        let alert10SecShown = false;
 
         const screens = {
             start: document.getElementById('start-screen'),
@@ -325,10 +322,10 @@
         function showToast(message, type = 'warning') {
             const toast = document.createElement('div');
             let bgColor = 'bg-yellow-400 text-yellow-900 border-yellow-500';
-            let icon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-alert-triangle"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12" y1="17" y2="17"/></svg>`;
+            let icon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>`;
             if (type === 'danger') {
                 bgColor = 'bg-red-500 text-white border-red-600';
-                icon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-alert-circle"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12" y1="16" y2="16"/></svg>`;
+                icon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
             }
             toast.className = `toast-enter flex items-center gap-2 px-6 py-3 rounded-full shadow-lg border-2 font-bold text-lg ${bgColor}`;
             toast.innerHTML = `${icon} <span>${message}</span>`;
@@ -441,10 +438,11 @@
             return diff.reverse();
         }
 
+        // 🚀 外部JSONファイル読み込み処理（自己修復・キャッシュバスター付き）
         async function startGame() {
             targetTextDisplay.textContent = "Loading question data...";
             
-            // JSON読み込みと解析
+            // 💡 URLの末尾に時刻を付けてブラウザのキャッシュを強制的に回避する
             const targetJsonFile = 'questions_en.json?t=' + new Date().getTime();
             
             try {
@@ -455,6 +453,7 @@
                 
                 let rawTexts = await response.json();
 
+                // 💡 自己修復: もしJSONが「文字列」として誤保存されていたら自動解読する
                 if (typeof rawTexts === 'string') {
                     try {
                         rawTexts = JSON.parse(rawTexts);
@@ -482,7 +481,6 @@
                 const timeInput = parseInt(document.getElementById('time-setting').value, 10);
                 GAME_TIME_SECONDS = (isNaN(timeInput) || timeInput <= 0) ? 10 * 60 : timeInput * 60;
 
-                // 画面遷移と初期化
                 screens.start.classList.add('hidden');
                 screens.game.classList.remove('hidden');
                 screens.game.classList.add('flex');
@@ -496,7 +494,7 @@
                 progressBar.style.width = '0%';
                 
                 userInput.value = '';
-                userInput.disabled = true; // 入力ロック
+                userInput.disabled = true; // 入力を一時ロック
                 
                 // カウントダウン開始
                 countdownOverlay.classList.remove('hidden');
@@ -517,10 +515,9 @@
                         countdownOverlay.classList.add('hidden');
                         
                         isPlaying = true;
-                        userInput.disabled = false;
-                        userInput.focus(); // フォーカスを当てて入力可能に
+                        userInput.disabled = false; // ロック解除
+                        userInput.focus(); // フォーカスを当ててすぐ入力可能に
                         
-                        // メインタイマー開始
                         if (timerInterval) clearInterval(timerInterval);
                         let alert2MinShown = false;
                         let alert10SecShown = false;
@@ -553,14 +550,14 @@
             } catch (error) {
                 console.error(error);
                 let specificReason = "File not found or blocked by CORS.";
-                let howToFix = "1. Make sure you have uploaded <strong>questions_en.json</strong> to the exact same folder as this HTML.<br>2. Make sure the spelling is exactly correct.";
+                let howToFix = "1. Make sure you have uploaded <strong>questions_en.json</strong> to the exact same folder as this HTML.<br>2. Make sure the spelling is exactly correct (e.g. no .txt at the end).";
                 
                 if (error.message.includes("Unexpected") || error.message.includes("JSON") || error.name === "SyntaxError") {
                     specificReason = "JSON Format Error (Syntax Error). The contents of the file are broken.";
-                    howToFix = "Please copy and paste the correct JSON data into <strong>questions_en.json</strong> again.";
+                    howToFix = "Please copy and paste the correct JSON data into <strong>questions_en.json</strong> again. Make sure you don't miss the <strong>[</strong> and <strong>]</strong> brackets at the start and end.";
                 } else if (error.message.includes("Data Error")) {
                     specificReason = error.message;
-                    howToFix = "Ensure the JSON is a valid array of objects.";
+                    howToFix = "The file was loaded, but the structure is wrong. Ensure it is a valid array of objects.";
                 } else if (error.message.includes("404")) {
                     specificReason = error.message;
                 }
