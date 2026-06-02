@@ -3,23 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>日本語長文タイピング検定</title>
+    <title>英語長文タイピング検定</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+JP:wght@400;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Noto+Sans:wght@400;500;700&display=swap');
 
         body {
-            font-family: 'Noto Sans JP', sans-serif;
+            font-family: 'Noto Sans', sans-serif;
             background-color: #f3f4f6;
         }
 
         .sync-text-box {
-            font-family: 'Noto Serif JP', serif;
+            font-family: 'Noto Serif', serif;
             font-size: 1.125rem;
             line-height: 2.2;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.02em;
             text-align: justify;
-            word-break: break-all;
+            word-wrap: break-word;
             padding: 1.5rem;
             width: 100%;
             border-radius: 0.5rem;
@@ -40,6 +40,11 @@
         .review-box {
             max-height: 300px;
             overflow-y: auto;
+        }
+
+        .space-char {
+            color: #94a3b8;
+            font-weight: normal;
         }
 
         @keyframes slideDown {
@@ -75,23 +80,22 @@
             .a4-paper {
                 width: 100%;
             }
-            .mode-ja {
-                font-family: "MS Mincho", "ＭＳ 明朝", serif;
+            .mode-en {
+                font-family: "Courier New", Courier, monospace;
                 font-size: 12pt;
             }
-            .mode-ja .doc-title {
+            .mode-en .doc-title {
                 text-align: center;
-                font-size: 16pt;
+                font-size: 14pt;
                 font-weight: bold;
                 margin-bottom: 20mm;
-                letter-spacing: 0.2em;
+                text-transform: uppercase;
             }
-            .mode-ja .text-line {
+            .mode-en .text-line {
                 display: flex;
                 justify-content: space-between;
                 align-items: flex-end;
-                line-height: 2.2;
-                letter-spacing: 1px;
+                line-height: 2.0;
             }
             .char-count {
                 color: #555;
@@ -115,11 +119,11 @@
     <header class="bg-white shadow-sm py-4 px-6 flex justify-between items-center z-10 relative">
         <h1 class="text-xl font-bold text-indigo-700 flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 8h.01"/><path d="M14 8h.01"/><path d="M18 8h.01"/><path d="M6 8h.01"/><path d="M10 12h.01"/><path d="M14 12h.01"/><path d="M18 12h.01"/><path d="M6 12h.01"/><path d="M10 16h4"/><rect width="20" height="16" x="2" y="4" rx="2"/></svg>
-            日本語長文タイピング検定
+            英語長文タイピング検定
         </h1>
         <div class="mode-switcher" style="text-align: right; margin: 10px 20px 0 0;">
-            <a href="https://ssio40.github.io/typing/en-typing.html" style="display: inline-block; padding: 8px 16px; background-color: #4A5568; color: white; text-decoration: none; border-radius: 5px; font-size: 14px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                🔤 English Typing
+            <a href="https://ssio40.github.io/typing/jp-typing.html" style="display: inline-block; padding: 8px 16px; background-color: #3182CE; color: white; text-decoration: none; border-radius: 5px; font-size: 14px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                🍣 日本語タイピング
             </a>
         </div>
         <div id="header-timer" class="hidden text-2xl font-mono font-bold text-gray-700 bg-gray-100 px-4 py-1 rounded-md border border-gray-200 transition-colors">
@@ -136,10 +140,9 @@
                 <p class="font-bold text-indigo-900 mb-2 border-b border-indigo-200 pb-2">【検定ルール】</p>
                 <ul class="list-disc list-inside space-y-2">
                     <li>制限時間は<strong>設定した時間</strong>です。</li>
-                    <li>課題文章（約2,000字以上）は外部の<strong>JSONデータベースからランダムに非同期で</strong>選ばれます。</li>
-                    <li>英数字や記号（ＡＩ、２０２３、％など）は<strong>すべて全角</strong>で入力してください。</li>
-                    <li>左側に表示される課題文を見ながら、右側の入力エリアにひたすら入力してください。改行の入力は不要です。</li>
-                    <li><strong>制限時間終了時に、日本語の未確定（変換中）の文字はすべて自動で削除されます。</strong></li>
+                    <li>課題文章（約2,000文字以上）は外部の<strong>JSONデータベースからランダムに非同期で</strong>選ばれます。</li>
+                    <li><strong>半角英数字</strong>で入力してください。大文字・小文字、コンマ、ピリオド、スペースも正確に入力する必要があります。</li>
+                    <li>左側に表示される課題文を見ながら、右側の入力エリアにひたすら入力してください。Enterキーによる改行入力は不要です（スペース扱いで判定されます）。</li>
                     <li>終了後、入力内容の印刷が可能です。</li>
                 </ul>
             </div>
@@ -159,7 +162,7 @@
             
             <div id="countdown-overlay" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/90 backdrop-blur-sm hidden">
                 <div id="countdown-text" class="text-9xl font-black text-indigo-600 drop-shadow-lg">3</div>
-                <p class="text-xl text-gray-500 font-bold mt-4">準備してください...</p>
+                <p class="text-xl text-gray-500 font-bold mt-4">Get ready...</p>
             </div>
 
             <div class="w-full bg-gray-200 h-2">
@@ -175,7 +178,7 @@
                         </h3>
                     </div>
                     <div class="flex-grow p-4 overflow-hidden flex">
-                        <div id="target-text-display" class="sync-text-box border-2 border-transparent overflow-y-auto text-gray-700 whitespace-pre-wrap select-none">読み込み中...</div>
+                        <div id="target-text-display" class="sync-text-box border-2 border-transparent overflow-y-auto text-gray-700 whitespace-pre-wrap select-none">Loading...</div>
                     </div>
                 </div>
 
@@ -186,14 +189,14 @@
                             入力エリア
                         </h3>
                         <div class="text-sm text-indigo-600 font-bold bg-indigo-50 px-3 py-1 rounded-full">
-                            入力文字数: <span id="current-length">0</span>
+                            Characters: <span id="current-length">0</span>
                         </div>
                     </div>
                     
                     <div class="flex-grow p-4 flex flex-col">
                         <textarea id="user-input" 
                             class="sync-text-box flex-grow border-2 border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-colors resize-none shadow-sm bg-white"
-                            placeholder="左の課題テキストを見ながら、ここに入力してください..."
+                            placeholder="Type the text shown on the left here..."
                             autocomplete="off" spellcheck="false" disabled></textarea>
                         
                         <div class="mt-4 flex justify-end">
@@ -232,7 +235,7 @@
                     <p class="text-sm text-gray-500 font-bold mb-1">入力スピード</p>
                     <div class="flex items-baseline justify-center gap-1">
                         <span id="res-wpm" class="text-3xl font-black text-blue-600">0</span>
-                        <span class="text-sm text-gray-500">文字/分</span>
+                        <span class="text-sm text-gray-500">CPM (文字/分)</span>
                     </div>
                 </div>
                 <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
@@ -253,7 +256,7 @@
                             <span class="flex items-center gap-1"><span class="inline-block w-3 h-3 bg-gray-300 rounded-sm"></span> 脱字</span>
                         </div>
                     </div>
-                    <div id="review-area" class="sync-text-box review-box bg-white border border-gray-200 shadow-inner text-gray-800 flex-grow"></div>
+                    <div id="review-area" class="sync-text-box review-box bg-white border border-gray-200 shadow-inner text-gray-800 flex-grow font-mono text-base"></div>
                 </div>
 
                 <div class="bg-indigo-50/50 p-6 rounded-lg border border-indigo-100 flex flex-col h-full">
@@ -265,7 +268,7 @@
                             <span class="flex items-center gap-1"><span class="inline-block w-3 h-1 bg-gray-400"></span> 脱字</span>
                         </div>
                     </div>
-                    <div id="correct-text-area" class="sync-text-box review-box bg-white border border-gray-200 shadow-inner text-gray-600 flex-grow whitespace-pre-wrap select-none"></div>
+                    <div id="correct-text-area" class="sync-text-box review-box bg-white border border-gray-200 shadow-inner text-gray-600 flex-grow font-mono text-base whitespace-pre-wrap select-none"></div>
                 </div>
             </div>
 
@@ -297,7 +300,6 @@
         
         let alert2MinShown = false;
         let alert10SecShown = false;
-        let isComposing = false;
 
         const screens = {
             start: document.getElementById('start-screen'),
@@ -320,10 +322,10 @@
         function showToast(message, type = 'warning') {
             const toast = document.createElement('div');
             let bgColor = 'bg-yellow-400 text-yellow-900 border-yellow-500';
-            let icon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12" y1="17" y2="17"/></svg>`;
+            let icon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>`;
             if (type === 'danger') {
                 bgColor = 'bg-red-500 text-white border-red-600';
-                icon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12" y1="16" y2="16"/></svg>`;
+                icon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
             }
             toast.className = `toast-enter flex items-center gap-2 px-6 py-3 rounded-full shadow-lg border-2 font-bold text-lg ${bgColor}`;
             toast.innerHTML = `${icon} <span>${message}</span>`;
@@ -341,17 +343,44 @@
             return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
         }
 
-        function renderPrintJapanese(text, titlePrefix) {
+        function normalizeTargetText(text) {
+            return text.replace(/[\n\r]+/g, ' ').replace(/\s{2,}/g, ' ').trim();
+        }
+
+        function normalizeUserText(text) {
+            return text.replace(/[\n\r]+/g, ' ');
+        }
+
+        function visualizeSpace(char) {
+            return char === ' ' ? '␣' : char;
+        }
+
+        function renderPrintEnglish(text, titlePrefix) {
             printArea.innerHTML = '';
-            printArea.className = 'a4-paper mode-ja';
-            const printText = text.replace(/[\n\r\s]/g, '');
-            let html = `<div class="doc-title">【${titlePrefix}】</div>`;
-            const maxLen = 30;
+            printArea.className = 'a4-paper mode-en';
+            const printText = text.replace(/[\n\r]+/g, ' ').replace(/\s{2,}/g, ' ').trim();
+            let html = `<div class="doc-title">${titlePrefix}</div>`;
+            const maxLen = 60;
             let cumulativeCount = 0;
-            for (let i = 0; i < printText.length; i += maxLen) {
-                const lineText = printText.substring(i, i + maxLen);
+            let currentIdx = 0;
+            while (currentIdx < printText.length) {
+                let lineText = "";
+                if (printText.length - currentIdx <= maxLen) {
+                    lineText = printText.substring(currentIdx);
+                    currentIdx = printText.length;
+                } else {
+                    let breakIdx = currentIdx + maxLen;
+                    while (breakIdx > currentIdx && printText[breakIdx] !== ' ') {
+                        breakIdx--;
+                    }
+                    if (breakIdx === currentIdx) {
+                        breakIdx = currentIdx + maxLen;
+                    }
+                    lineText = printText.substring(currentIdx, breakIdx);
+                    currentIdx = breakIdx + 1; 
+                }
                 cumulativeCount += lineText.length;
-                html += `<div class="text-line"><span class="text-content">${lineText}</span><span class="char-count">(${cumulativeCount})</span></div>`;
+                html += `<div class="text-line"><span class="text-content">${lineText}</span><span class="char-count">[${cumulativeCount}]</span></div>`;
             }
             printArea.innerHTML = html;
         }
@@ -409,18 +438,11 @@
             return diff.reverse();
         }
 
-        userInput.addEventListener('compositionstart', () => { isComposing = true; });
-        userInput.addEventListener('compositionend', () => {
-            isComposing = false;
-            const cleanUserText = userInput.value.replace(/[\n\r\s]/g, '');
-            currentLengthDisplay.textContent = cleanUserText.length;
-        });
-
         // 🚀 外部JSONファイル読み込み処理（自己修復・強力なキャッシュ無効化機能付き）
         async function startGame() {
-            targetTextDisplay.textContent = "お題をロードしています...";
+            targetTextDisplay.textContent = "Loading question data...";
             
-            const targetJsonFile = 'questions_ja.json';
+            const targetJsonFile = 'questions_en.json';
             
             try {
                 // 💡 ブラウザの古い記憶（キャッシュ）を絶対に読まず、常に最新を取りに行く最強オプション
@@ -432,7 +454,7 @@
 
                 const contentType = response.headers.get("content-type");
                 if (contentType && contentType.includes("text/html")) {
-                    throw new Error("HTML_RETURNED: JSONではなくHTMLファイルが返ってきました。ファイル名が間違っているか、URLが存在しません。");
+                    throw new Error("HTML_RETURNED: Expected JSON, but received HTML. The file might be missing or misconfigured on the server.");
                 }
                 
                 let responseText = await response.text();
@@ -444,21 +466,21 @@
                         rawTexts = JSON.parse(rawTexts);
                     }
                 } catch (e) {
-                    throw new Error("JSON Format Error: 中身のデータ形式が壊れています。");
+                    throw new Error("JSON Format Error: The file content is severely broken and cannot be parsed.");
                 }
 
                 if (!Array.isArray(rawTexts) || rawTexts.length === 0) {
-                    throw new Error("Data Error: 問題データが空っぽか、正しい形式 [ ... ] ではありません。");
+                    throw new Error("Data Error: The JSON file is empty or not formatted as an array [ ... ].");
                 }
 
                 targetTextObj = rawTexts[Math.floor(Math.random() * rawTexts.length)];
                 
                 if (!targetTextObj || !targetTextObj.text) {
-                     throw new Error("Data Error: 問題データの中に 'text' (文章) が見つかりませんでした。");
+                    throw new Error("Data Error: The 'text' property is missing in the selected question.");
                 }
 
                 rawText = targetTextObj.text;
-                cleanTargetText = rawText.replace(/[\n\r\s]/g, '');
+                cleanTargetText = normalizeTargetText(rawText);
 
                 targetTitleDisplay.textContent = targetTextObj.title;
                 targetTextDisplay.textContent = rawText; 
@@ -480,7 +502,7 @@
                 progressBar.style.width = '0%';
                 
                 userInput.value = '';
-                userInput.disabled = true; // 入力ロック
+                userInput.disabled = true; // 入力を一時ロック
                 
                 // カウントダウン開始
                 countdownOverlay.classList.remove('hidden');
@@ -501,14 +523,12 @@
                         countdownOverlay.classList.add('hidden');
                         
                         isPlaying = true;
-                        userInput.disabled = false;
-                        userInput.focus(); // フォーカスを当てて入力可能に
+                        userInput.disabled = false; // ロック解除
+                        userInput.focus(); // フォーカスを当ててすぐ入力可能に
                         
-                        // メインタイマー開始
                         if (timerInterval) clearInterval(timerInterval);
                         let alert2MinShown = false;
                         let alert10SecShown = false;
-                        isComposing = false;
                         
                         timerInterval = setInterval(() => {
                             timeLeft--;
@@ -517,7 +537,7 @@
                             progressBar.style.width = `${((GAME_TIME_SECONDS - timeLeft) / GAME_TIME_SECONDS) * 100}%`;
 
                             if (timeLeft === 120 && !alert2MinShown && GAME_TIME_SECONDS > 120) {
-                                showToast("残り2分です。ペースを維持しましょう！", "warning");
+                                showToast("Remaining time: 2 minutes!", "warning");
                                 alert2MinShown = true;
                             }
                             if (timeLeft <= 60 && !headerTimer.classList.contains('text-red-600')) {
@@ -525,11 +545,11 @@
                                 headerTimer.classList.remove('text-gray-700', 'bg-gray-100');
                             }
                             if (timeLeft === 10 && !alert10SecShown && GAME_TIME_SECONDS > 10) {
-                                showToast("残り10秒！ラストスパート！", "danger");
+                                showToast("Remaining time: 10 seconds! Final sprint!", "danger");
                                 alert10SecShown = true;
                             }
                             if (timeLeft <= 0) {
-                                endGame("タイムアップ！");
+                                endGame("Time's up!");
                             }
                         }, 1000);
                     }
@@ -538,39 +558,39 @@
             } catch (error) {
                 console.error(error);
                 let specificReason = "File not found or blocked by CORS.";
-                let howToFix = "1. フォルダ内に <strong>questions_ja.json</strong> が正しく配置されているか確認してください。<br>2. ブラウザが古い情報を記憶している可能性があります。「Ctrl + F5」キーでページを強力に更新してください。";
+                let howToFix = "1. Make sure you have uploaded <strong>questions_en.json</strong> to the exact same folder as this HTML.<br>2. Make sure the spelling is exactly correct (e.g. no .txt at the end).";
                 
                 if (error.message.includes("HTML_RETURNED")) {
-                    specificReason = "JSONではなくHTMLが読み込まれました（URL不一致）";
-                    howToFix = "ブラウザで直接 <code>https://(あなたのURL)/questions_ja.json</code> にアクセスして、正しい文字データが出るか確認してください。もしサイトのトップページが出たら、ファイル名が間違っています。";
+                    specificReason = "The URL is incorrect and a webpage was loaded instead of JSON.";
+                    howToFix = "Please directly open <code>https://(your URL)/questions_en.json</code> in your browser and verify if the actual JSON text appears.";
                 } else if (error.message.includes("JSON Format Error")) {
-                    specificReason = "JSON Format Error (Syntax Error). 中身が壊れています。";
-                    howToFix = "JSONの中身が壊れています。もう一度データを最初からコピーし直してみてください。";
+                    specificReason = "JSON Format Error (Syntax Error). The contents of the file are broken.";
+                    howToFix = "Please copy and paste the correct JSON data into <strong>questions_en.json</strong> again.";
                 } else if (error.message.includes("Data Error")) {
                     specificReason = error.message;
-                } else if (error.message.includes("404")) {
+                    howToFix = "The file was loaded, but the structure is wrong. Ensure it is a valid array of objects.";
+                } else if (error.message.includes("404") || error.message.includes("Failed to fetch")) {
                     specificReason = error.message;
+                    howToFix = "If you are opening this file locally (on your PC), your browser might block loading JSON. Please upload to GitHub Pages and test!";
                 }
 
                 targetTextDisplay.innerHTML = `<div class="text-red-600 font-bold p-4 bg-red-50 border border-red-200 rounded-lg">
-                    <p class="text-lg mb-2">⚠️ 問題ファイルをロードできませんでした</p>
+                    <p class="text-lg mb-2">⚠️ Failed to load question file</p>
                     <p class="text-sm text-gray-700 font-normal leading-relaxed">
-                        エラー詳細: <strong>${error.message}</strong><br>
-                        原因: <strong><span class="text-red-600">${specificReason}</span></strong><br><br>
-                        <strong>【解決方法】</strong><br>
+                        Error Detail: <strong>${error.message}</strong><br>
+                        Probable Reason: <strong><span class="text-red-600">${specificReason}</span></strong><br><br>
+                        <strong>[How to fix]</strong><br>
                         ${howToFix}
                     </p>
                 </div>`;
-                showToast("JSONファイルの読み込みに失敗しました。", "danger");
+                showToast("Could not load JSON file.", "danger");
             }
         }
 
         userInput.addEventListener('input', () => {
             if (!isPlaying) return;
-            if (!isComposing) {
-                const cleanUserText = userInput.value.replace(/[\n\r\s]/g, '');
-                currentLengthDisplay.textContent = cleanUserText.length;
-            }
+            const cleanUserText = normalizeUserText(userInput.value);
+            currentLengthDisplay.textContent = cleanUserText.length;
         });
 
         function renderReview(diff) {
@@ -578,8 +598,8 @@
             correctTextArea.innerHTML = ''; 
 
             if (diff.length === 0) {
-                reviewArea.innerHTML = '<p class="text-gray-500">入力がありませんでした。</p>';
-                correctTextArea.innerHTML = '<p class="text-gray-500">入力がなかったため、手本は表示されません。</p>';
+                reviewArea.innerHTML = '<p class="text-gray-500">No input detected.</p>';
+                correctTextArea.innerHTML = '<p class="text-gray-500">No input detected.</p>';
                 return;
             }
 
@@ -589,47 +609,49 @@
                 const span = document.createElement('span');
                 if (d.type === 'match') {
                     span.textContent = d.char;
+                    if (d.char === ' ') span.className = 'space-char';
                 } else if (d.type === 'replace') {
-                    span.textContent = d.actual;
-                    span.className = 'bg-red-200 text-red-900 font-bold px-1 mx-px rounded border-b-2 border-red-500';
-                    span.title = `誤字 (正解: ${d.expected})`;
+                    span.textContent = visualizeSpace(d.actual);
+                    span.className = 'bg-red-200 text-red-900 font-bold px-0.5 mx-px rounded border-b-2 border-red-500';
+                    span.title = `Incorrect (Expected: ${visualizeSpace(d.expected)})`;
                 } else if (d.type === 'insert') {
-                    span.textContent = d.actual;
-                    span.className = 'bg-yellow-200 text-yellow-900 font-bold px-1 mx-px rounded border-b-2 border-yellow-500';
-                    span.title = `余分な文字`;
+                    span.textContent = visualizeSpace(d.actual);
+                    span.className = 'bg-yellow-200 text-yellow-900 font-bold px-0.5 mx-px rounded border-b-2 border-yellow-500';
+                    span.title = `Extra character`;
                 } else if (d.type === 'delete') {
-                    span.textContent = d.expected;
-                    span.className = 'bg-gray-300 text-gray-500 line-through px-1 mx-px rounded';
-                    span.title = `脱字 (抜けている文字)`;
+                    span.textContent = visualizeSpace(d.expected);
+                    span.className = 'bg-gray-300 text-gray-500 line-through px-0.5 mx-px rounded';
+                    span.title = `Missing character`;
                 }
                 reviewArea.appendChild(span);
 
                 if (d.type === 'match') {
                     const cSpan = document.createElement('span');
                     cSpan.textContent = d.char;
+                    if (d.char === ' ') cSpan.className = 'space-char';
                     correctSpans.push(cSpan);
                 } else if (d.type === 'replace') {
                     const cSpan = document.createElement('span');
-                    cSpan.textContent = d.expected;
-                    cSpan.className = 'border-b-4 border-red-400 text-red-900 font-bold bg-red-50';
-                    cSpan.title = `誤字箇所 (あなたの入力: ${d.actual})`;
+                    cSpan.textContent = visualizeSpace(d.expected);
+                    cSpan.className = 'border-b-4 border-red-400 text-red-900 font-bold bg-red-50 px-0.5';
+                    cSpan.title = `Incorrect part (Your input: ${visualizeSpace(d.actual)})`;
                     correctSpans.push(cSpan);
                 } else if (d.type === 'delete') {
                     const cSpan = document.createElement('span');
-                    cSpan.textContent = d.expected;
-                    cSpan.className = 'border-b-4 border-gray-400 text-gray-900 font-bold bg-gray-100';
-                    cSpan.title = `脱字箇所 (入力が抜けています)`;
+                    cSpan.textContent = visualizeSpace(d.expected);
+                    cSpan.className = 'border-b-4 border-gray-400 text-gray-900 font-bold bg-gray-100 px-0.5';
+                    cSpan.title = `Missing part`;
                     correctSpans.push(cSpan);
                 } else if (d.type === 'insert') {
                     if (correctSpans.length > 0) {
                         const lastSpan = correctSpans[correctSpans.length - 1];
                         lastSpan.classList.add('border-b-4', 'border-yellow-400', 'bg-yellow-50', 'font-bold');
-                        lastSpan.title = lastSpan.title ? lastSpan.title + ` / この直後に余分な入力あり` : `この直後に余分な入力あり: ${d.actual}`;
+                        lastSpan.title = lastSpan.title ? lastSpan.title + ` / Extra input after this` : `Extra input after this: ${visualizeSpace(d.actual)}`;
                     } else {
                         const marker = document.createElement('span');
                         marker.textContent = ' ';
                         marker.className = 'border-b-4 border-yellow-400 bg-yellow-50';
-                        marker.title = `先頭に余分な入力あり: ${d.actual}`;
+                        marker.title = `Extra input at start: ${visualizeSpace(d.actual)}`;
                         correctSpans.push(marker);
                     }
                 }
@@ -642,19 +664,7 @@
             isPlaying = false;
             clearInterval(timerInterval);
             toastContainer.innerHTML = ''; 
-
-            if (document.activeElement === userInput) {
-                userInput.blur();
-            }
             
-            let finalUserValue = userInput.value;
-            
-            if (isComposing || reason === "タイムアップ！") {
-                finalUserValue = finalUserValue.replace(/[a-zA-Zぁ-んァ-ヶー]*$/, '');
-                userInput.value = finalUserValue;
-                isComposing = false;
-            }
-
             screens.game.classList.remove('flex');
             screens.game.classList.add('hidden');
             screens.result.classList.remove('hidden');
@@ -662,7 +672,7 @@
 
             document.getElementById('finish-reason').textContent = reason;
 
-            const cleanUserText = finalUserValue.replace(/[\n\r\s]/g, '');
+            const cleanUserText = normalizeUserText(userInput.value);
             const totalInputChars = cleanUserText.length;
             
             const elapsedSeconds = GAME_TIME_SECONDS - Math.max(0, timeLeft);
@@ -689,9 +699,9 @@
 
             let rank = 'C';
             let rankColor = 'text-gray-500';
-            if (wpm >= 250 && accuracy >= 95) { rank = 'S'; rankColor = 'text-yellow-400'; }
-            else if (wpm >= 150 && accuracy >= 90) { rank = 'A'; rankColor = 'text-red-500'; }
-            else if (wpm >= 80 && accuracy >= 80) { rank = 'B'; rankColor = 'text-blue-500'; }
+            if (wpm >= 350 && accuracy >= 95) { rank = 'S'; rankColor = 'text-yellow-400'; }
+            else if (wpm >= 250 && accuracy >= 90) { rank = 'A'; rankColor = 'text-red-500'; }
+            else if (wpm >= 150 && accuracy >= 80) { rank = 'B'; rankColor = 'text-blue-500'; }
 
             document.getElementById('res-input-chars').textContent = totalInputChars;
             document.getElementById('res-accuracy').textContent = accuracy.toFixed(1);
@@ -708,11 +718,11 @@
         });
 
         document.getElementById('btn-print-target').addEventListener('click', () => {
-            renderPrintJapanese(rawText, '課題文'); 
+            renderPrintEnglish(rawText, 'Typing Test Text'); 
             window.print();
         });
         document.getElementById('btn-print-user').addEventListener('click', () => {
-            renderPrintJapanese(userInput.value, 'あなたの入力内容');
+            renderPrintEnglish(userInput.value, 'Your Input Text');
             window.print();
         });
 
